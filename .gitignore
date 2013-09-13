@@ -1,0 +1,4 @@
+/eventfabric.api/bin
+/eventfabric.api.test/bin
+/eventfabric.api.test/test-results/
+TestResult.xml
