@@ -64,17 +64,6 @@ namespace eventfabric.api
 			}
 		}
 
-		public object CreateUser (Session user)
-		{
-			try {
-				var req = CreateWebRequest (EventPath, Login ());
-				var eventJson = Utils.SerializeFromTToJson (user);
-				return QueryWebRequest (req, eventJson);
-			} catch (Exception ex) {
-				return HttpStatusCode.ServiceUnavailable;
-			}
-		}
-
 		private Cookie Login ()
 		{
 			if (Cookie != null && Cookie.Expires >= DateTime.Now) {

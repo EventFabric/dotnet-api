@@ -28,15 +28,11 @@ namespace eventfabric.api
 
 		public static string SerializeFromTToJson<T> (T data)
 		{
-			try {
-				var ms = new MemoryStream ();
-				var ser = new DataContractJsonSerializer (data.GetType ());
-				ser.WriteObject (ms, data);
-				var json = Encoding.Default.GetString (ms.ToArray ());
-				return json;
-			} catch {
-				return string.Empty;
-			}
+		    var ms = new MemoryStream ();
+		    var ser = new DataContractJsonSerializer (data.GetType ());
+		    ser.WriteObject (ms, data);
+		    var json = Encoding.Default.GetString (ms.ToArray ());
+		    return json;
 		}
 	}
 }

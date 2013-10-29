@@ -1,18 +1,16 @@
 using System;
-using NUnit.Framework;
 using eventfabric.api;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace eventfabric.api.test
 {
-	[TestFixture()]
+    [TestClass]
 	public class ClientTest
 	{
-		private Session user = new Session ("youruser", "yourpassword", "demouser@event-fabric.com");
-
-		[Test()]
+        [TestMethod]
 		public void TestSendEvents ()
 		{
-			var client = new Client ("http", "event-fabric.com", 80, "/api/session", "/api/event", user.username, user.password);
+            var client = new Client("http", "event-fabric.com", 80, "/api/session", "/api/event", "javierdallamore", "apache");
 			for (int i = 0; i < 10; i++) {
 				var value = new Value (i, string.Format ("Text is {0}", i));
 				var @event = new Event ("your.channel", value);
