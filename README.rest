@@ -22,6 +22,8 @@ Add a reference in your project to eventfabric.app.dll or to the project itself
 Usage
 -----
 
+using c#::
+
     using eventfabric.api;
     ...
     ...
@@ -29,15 +31,15 @@ Usage
     var client = new Client("http", "event-fabric.com", 80, "/api/session", "/api/event");
     // the default constructor 'new Client()' uses this parameters by default.
     
-	var loginResponse = client.Login("your.username", "your.password");
+    var loginResponse = client.Login("your.username", "your.password");
     
-	// your entity could be any object that has public properties(see eventfabric.api.test folder)
-	var yourEntity = new YourEntity();
+    // your entity could be any object that has public properties(see eventfabric.api.test folder)
+    var yourEntity = new YourEntity();
     var myEvent = new Event("your.channel", yourEntity);
     
-	var response = client.SendEvent(myEvent, loginResponse.Cookies);
-	
-	
+    var response = client.SendEvent(myEvent, loginResponse.Cookies);
+
+
 see eventfabric.api.test folder for more examples of how to use DotNet Event Fabric API.
 
 
