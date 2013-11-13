@@ -15,21 +15,28 @@ namespace EventFabricExample_Products
 {
     public partial class EventFabricProducts : Form
     {
-        private Client _client;
+        private readonly Client _client;
+        private Response _loginResponse; 
+        private bool _isRunning;
 
         public EventFabricProducts()
         {
+            _client = new Client("http", "event-fabric.com", 80, "/api/session", "/api/event");
             InitializeComponent();
         }
 
-        private void EventFabricProducts_Load(object sender, EventArgs e)
+        private void EventFabricProductsLoad(object sender, EventArgs e)
         {
 
         }
 
         private void BtnConnectClick(object sender, EventArgs e)
         {
-            Connect();
+            _loginResponse = _client.Login(txtUsername.Text, txtPassword.Text);
+            var responseText = String.Format("Status: {0} {1}",
+                                                _loginResponse.StatusCode, _loginResponse.StatusDescription);
+
+            txtResponse.Text = responseText;
         }
 
         private void BtnPlayClick(object sender, EventArgs e)
@@ -39,27 +46,41 @@ namespace EventFabricExample_Products
 
         private void Play()
         {
+            _isRunning = btnPlay.Text == Resources.EventFabricProducts_Play_Play;
+
             btnPlay.Text = btnPlay.Text == Resources.EventFabricProducts_Play_Play
                                ? Resources.EventFabricProducts_Play_Pause
                                : Resources.EventFabricProducts_Play_Play;
+
+            if (_isRunning)
+            {
+                var oThread = new Thread(RunSendEvent);
+                // Start the thread
+                oThread.Start();
+            }
+
+        }
+
+        private void RunSendEvent()
+        {
+            if (_isRunning)
+            {
+                SendEvent();
+                Thread.Sleep(Convert.ToInt32(txtInterval.Text) * 1000);
+                RunSendEvent();
+            }
         }
 
         private void BtnSendClick(object sender, EventArgs e)
         {
-            SendEvent();
+            txtResponse.Text = SendEvent();
         }
 
-        private void Connect()
+        private String SendEvent()
         {
-            _client = new Client("http", "event-fabric.com", 80, "/api/session", "/api/event", txtUsername.Text,
-                                 txtPassword.Text);
-        }
-
-        private void SendEvent()
-        {
-            if (_client == null)
+            if (_loginResponse == null || _loginResponse.StatusCode != 201)
             {
-                Connect();
+                _loginResponse = _client.Login(txtUsername.Text, txtPassword.Text);
             }
 
             var products = txtProducts.Text.Split(',');
@@ -71,13 +92,13 @@ namespace EventFabricExample_Products
             var value = new Product(product, count, price, delivered);
 
             var @event = new Event(txtChannel.Text, value);
-            HttpStatusCode response = _client.SendEvent(@event);
 
-            String responseText = String.Format("Status: {0}\nEvent:\n{1}",
-                                                response, @event);
+            var response = _client.SendEvent(@event, _loginResponse.Cookies);
 
-            txtResponse.Text = responseText;
+            var responseText = String.Format("Status: {0} {1}\n Event:\n{2}",
+                                                response.StatusCode, response.StatusDescription, @event);
 
+            return responseText;
         }
     }
 }

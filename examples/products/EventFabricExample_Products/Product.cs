@@ -1,16 +1,18 @@
+using System;
+
 namespace EventFabricExample_Products
 {
     public class Product
     {
-        private string product { get; set; }
-        private int format { get; set; }
-        private double price { get; set; }
-        private bool delivered { get; set; }
+        public string product { get; set; }
+        public int count { get; set; }
+        public double price { get; set; }
+        public bool delivered { get; set; }
 
-        public Product(string product, int format, double price, bool delivered)
+        public Product(string product, int count, double price, bool delivered)
         {
             this.product = product;
-            this.format = format;
+            this.count = count;
             this.price = price;
             this.delivered = delivered;
         }
@@ -18,6 +20,11 @@ namespace EventFabricExample_Products
         public Product()
         {
 
+        }
+
+        public override String ToString()
+        {
+            return String.Format("Product: {0}. Count: {1}. Price: {1}. Delivered: {1}", product, count, price, delivered);
         }
     }
 }

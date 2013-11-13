@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.Serialization.Json;
-using System.Text;
+﻿using Newtonsoft.Json;
 
 namespace eventfabric.api
 {
@@ -12,15 +7,7 @@ namespace eventfabric.api
 		public static T DeserializeJsonTo<T> (string jsonSerializado)
 		{
 			try {
-				var obj = Activator.CreateInstance<T> ();
-				var ms = new MemoryStream (Encoding.Unicode.GetBytes (jsonSerializado));
-				var serializer = new DataContractJsonSerializer (obj.GetType ());
-				obj = (T)serializer.ReadObject (ms);
-
-				ms.Close ();
-				ms.Dispose ();
-
-				return obj;
+                return JsonConvert.DeserializeObject<T>(jsonSerializado);
 			} catch {
 				return default(T);
 			}
@@ -28,11 +15,7 @@ namespace eventfabric.api
 
 		public static string SerializeFromTToJson<T> (T data)
 		{
-		    var ms = new MemoryStream ();
-		    var ser = new DataContractJsonSerializer (data.GetType ());
-		    ser.WriteObject (ms, data);
-		    var json = Encoding.Default.GetString (ms.ToArray ());
-		    return json;
+            return JsonConvert.SerializeObject(data);
 		}
 	}
 }

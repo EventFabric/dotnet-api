@@ -1,4 +1,7 @@
-/eventfabric.api/bin
-/eventfabric.api.test/bin
-/eventfabric.api.test/test-results/
 TestResult.xml
+Local.testsettings
+TraceAndTestImpact.testsettings
+_ReSharper.eventfabric.api
+eventfabric.api.sln.DotSettings.user
+eventfabric.api.suo
+eventfabric.api.vsmdi

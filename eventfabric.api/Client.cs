@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using System.Text;
 
 namespace eventfabric.api
 {
@@ -16,36 +17,40 @@ namespace eventfabric.api
 
 		private int Port { get; set; }
 
-		private Cookie Cookie { get; set; }
-
 		public Client (
             String scheme,
             String host,
             int port,
             String sessionPath,
-            String eventPath,
-            String userName,
-            String password)
+            String eventPath)
 		{
 			Scheme = scheme;
 			Host = host;
 			Port = port;
 			SessionPath = sessionPath;
 			EventPath = eventPath;
-			UserName = userName;
-			Password = password;
 		}
 
-		private HttpWebRequest CreateWebRequest (string path, Cookie cookie)
+        public Client()
+            : this("http", "event-fabric.com", 80, "/api/session", "/api/event")
+        {
+            
+        }
+
+		private HttpWebRequest CreateWebRequest (string path, CookieCollection cookies)
 		{
 			var req = WebRequest.Create ((new UriBuilder (Scheme, Host, Port, path)).Uri) as HttpWebRequest;
 			if (req != null) {
 				req.Method = "POST";
 				req.ContentType = "application/json";
 				req.Accept = "application/json";
-				req.CookieContainer = new CookieContainer ();
-				if (cookie != null) {
-					req.CookieContainer.Add (cookie);
+				req.CookieContainer = new CookieContainer();
+				if (cookies != null) {
+				    foreach (var cookie in cookies)
+				    {
+                        req.CookieContainer.Add((Cookie)cookie);    
+				    }
+					
 				}
                
 				return req;
@@ -53,34 +58,21 @@ namespace eventfabric.api
 			return null;
 		}
         
-		public HttpStatusCode SendEvent (Event @event)
+		public Response SendEvent (Event @event, CookieCollection cookie)
 		{
-			try {
-				var req = CreateWebRequest (EventPath, Login ());
-				var eventJson = Utils.SerializeFromTToJson (@event);
-				return QueryWebRequest (req, eventJson);
-			} catch (Exception ex) {
-				return HttpStatusCode.ServiceUnavailable;
-			}
+            var req = CreateWebRequest(EventPath, cookie);
+			var eventJson = Utils.SerializeFromTToJson(@event);
+			return QueryWebRequest(req, eventJson);
 		}
 
-		private Cookie Login ()
+        public Response Login(string username, string password)
 		{
-			if (Cookie != null && Cookie.Expires >= DateTime.Now) {
-				return Cookie;
-			}
-
-			var req = CreateWebRequest (SessionPath, Cookie);
-			var json = Utils.SerializeFromTToJson (new Session (UserName, Password, ""));
-			QueryWebRequest (req, json);
-			return Cookie;
+			var req = CreateWebRequest (SessionPath, null);
+			var json = Utils.SerializeFromTToJson (new Session (username, password));
+			return QueryWebRequest (req, json);			
 		}
 
-		protected string UserName { get; set; }
-        
-		protected string Password { get; set; }
-
-		private HttpStatusCode QueryWebRequest (HttpWebRequest req, string json)
+        private Response QueryWebRequest(HttpWebRequest req, string json)
 		{
 			if (req != null) {
 				var writer = new StreamWriter (req.GetRequestStream ());
@@ -88,14 +80,38 @@ namespace eventfabric.api
 				writer.Close ();
 
 				using (var resp = req.GetResponse() as HttpWebResponse) {
-					if (resp != null && resp.Cookies.Count > 0) {
-						Cookie = resp.Cookies [0];
-						Cookie.Path = "/";
-					}
-					return resp.StatusCode;
+				    if (resp != null)
+				    {
+				        var body = GetBody(resp);
+                        return new Response(resp.StatusDescription, Convert.ToInt32(resp.StatusCode), body, resp.Cookies);
+				    }
 				}
 			}
-			return HttpStatusCode.ServiceUnavailable;
+            return new Response((string) "ServiceUnavailable", Convert.ToInt32(HttpStatusCode.ServiceUnavailable));
 		}
+
+	    private String GetBody(HttpWebResponse resp)
+	    {
+	        var body = new StringBuilder();
+            // Gets the stream associated with the response.
+            var receiveStream = resp.GetResponseStream();
+            var encode = System.Text.Encoding.GetEncoding("utf-8");
+            // Pipes the stream to a higher level stream reader with the required encoding format. 
+	        if (receiveStream != null)
+	        {
+	            var readStream = new StreamReader(receiveStream, encode);
+	            var read = new Char[256];
+	            // Reads 256 characters at a time.     
+	            var count = readStream.Read(read, 0, 256);
+	            while (count > 0)
+	            {
+	                // Dumps the 256 characters on a string and displays the string to the console.
+	                var str = new String(read, 0, count);
+	                body.Append(str);
+	                count = readStream.Read(read, 0, 256);
+	            }
+	        }
+	        return body.ToString();
+	    }
 	}
 }

@@ -136,13 +136,16 @@
             this.txtUsername.Name = "txtUsername";
             this.txtUsername.Size = new System.Drawing.Size(194, 20);
             this.txtUsername.TabIndex = 9;
+            this.txtUsername.Text = "demouser";
             // 
             // txtPassword
             // 
             this.txtPassword.Location = new System.Drawing.Point(76, 32);
             this.txtPassword.Name = "txtPassword";
+            this.txtPassword.PasswordChar = '*';
             this.txtPassword.Size = new System.Drawing.Size(194, 20);
             this.txtPassword.TabIndex = 10;
+            this.txtPassword.Text = "demouser";
             // 
             // txtChannel
             // 
@@ -150,6 +153,7 @@
             this.txtChannel.Name = "txtChannel";
             this.txtChannel.Size = new System.Drawing.Size(194, 20);
             this.txtChannel.TabIndex = 11;
+            this.txtChannel.Text = "dotnet";
             // 
             // txtInterval
             // 
@@ -157,6 +161,7 @@
             this.txtInterval.Name = "txtInterval";
             this.txtInterval.Size = new System.Drawing.Size(194, 20);
             this.txtInterval.TabIndex = 12;
+            this.txtInterval.Text = "3";
             // 
             // txtProducts
             // 
@@ -164,6 +169,7 @@
             this.txtProducts.Name = "txtProducts";
             this.txtProducts.Size = new System.Drawing.Size(194, 20);
             this.txtProducts.TabIndex = 13;
+            this.txtProducts.Text = "Sugar,Water,Milk,Bread,Eggs";
             // 
             // label7
             // 
@@ -206,7 +212,7 @@
             this.Controls.Add(this.label1);
             this.Name = "EventFabricProducts";
             this.Text = "Event Fabric - Products - Agent example";
-            this.Load += new System.EventHandler(this.EventFabricProducts_Load);
+            this.Load += new System.EventHandler(this.EventFabricProductsLoad);
             this.ResumeLayout(false);
             this.PerformLayout();
 

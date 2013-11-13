@@ -17,5 +17,9 @@ namespace eventfabric.api
             this.email = email;
         }
 
+        public Session(string username, string password):this(username, password, "")
+        {
+            
+        }
     }
 }
