@@ -1,36 +1,58 @@
 Event Fabric API Client
 =======================
 
-.NET implementation of Event Fabric API to send events. It was developed in Mono 2.10.8.1 using MonoDevelop 3.0.3.2, but is perfectly compatible with .NET and Visual Studio.
+
+.NET implementation of Event Fabric API to send events.
+
+
+It was developed in Mono 2.10.8.1 using MonoDevelop 3.0.3.2, but is perfectly compatible with .NET and Visual Studio.
+
+
 
 Setup
 -----
 
+
 Download the code and build eventfabric.app project using Microsoft Visual Studio or MonoDevelop. 
 
+
 Add a reference in your project to eventfabric.app.dll or to the project itself
+
 
 Usage
 -----
 
 	using eventfabric.api;
 
+
 	...
+
+
 	...
+
 	
 	var client = new Client("http", "event-fabric.com", 80, "/api/session", "/api/event");
+
+
 	// the default constructor 'new Client()' uses this parameters by default.
+
 	
 	var loginResponse = client.Login("your.username", "your.password");
+
 	
 	// your entity could be any object that has public properties(see eventfabric.api.test folder)
+
+
 	var yourEntity = new YourEntity();
+
 	
 	var myEvent = new Event("your.channel", yourEntity);
+
 
 	var response = client.SendEvent(myEvent, loginResponse.Cookies);
 	
 	
+
 see eventfabric.api.test folder for more examples of how to use DotNet Event Fabric API.
 
 
