@@ -1,0 +1,66 @@
+using System;
+using System.Collections.Generic;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace eventfabric.api.test
+{
+    [TestClass]
+    public class OnlineBillTest
+    {
+        [TestMethod]
+        public void TestSendEvents()
+        {
+            //var client = new Client("http", "event-fabric.com", 80, "/api/session", "/api/event");
+            var client = new Client();
+            // login with your username and password in Event Fabric
+            var loginResponse = client.Login("demouser", "demouser");
+
+            var productApple = new Product { Name = "Apple", Description = "Argentinian Apple" };
+            var productBanana = new Product { Name = "Banana", Description = "Ecuadorian Banana" };
+
+            var olineBillDetailApple = new OnlineBillDetail { Product = productApple, Quantity = 2, UnitPrice = 5.6 };
+            var olineBillDetailBanana = new OnlineBillDetail { Product = productBanana, Quantity = 3, UnitPrice = 4.4 };
+
+            var totalPrice = (olineBillDetailBanana.Quantity * olineBillDetailBanana.UnitPrice) +
+                             (olineBillDetailApple.Quantity * olineBillDetailApple.UnitPrice);
+
+            var onlineBill = new OnlineBill { AccountNumber = "987654321", TotalPrice = totalPrice };
+
+            onlineBill.OnlineBillDetails.Add(olineBillDetailApple);
+            onlineBill.OnlineBillDetails.Add(olineBillDetailBanana);
+
+            // Create event entity with online bill as value of the event
+            var _event = new Event("online bill", onlineBill);
+            // send the event to Event Fabric
+            var response = client.SendEvent(_event, loginResponse.Cookies);
+            
+            Assert.AreEqual(201, response.StatusCode);
+        }
+    }
+
+    public class OnlineBill
+    {
+        public String AccountNumber { get; set; }
+        public List<OnlineBillDetail> OnlineBillDetails;
+        public double TotalPrice { get; set; }
+
+        public OnlineBill()
+        {
+            OnlineBillDetails = new List<OnlineBillDetail>();
+        }
+
+    }
+
+    public class OnlineBillDetail
+    {
+        public Product Product { get; set; }
+        public int Quantity { get; set; }
+        public double UnitPrice { get; set; }
+    }
+
+    public class Product
+    {
+        public String Name { get; set; }
+        public String Description { get; set; }
+    }
+}

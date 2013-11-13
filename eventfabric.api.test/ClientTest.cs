@@ -1,5 +1,4 @@
 using System;
-using eventfabric.api;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace eventfabric.api.test
